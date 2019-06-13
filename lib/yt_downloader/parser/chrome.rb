@@ -1,6 +1,8 @@
+require 'yt_downloader/parser/base'
+require 'json'
+
 module YtDownloader
-  module Parser
-    require 'yt_downloader/parser/base'
+  class Parser
 
     CHROME = 'chrome'.freeze
 
@@ -8,7 +10,9 @@ module YtDownloader
       MAC_OSX = 'Darwin'.freeze
       LINUX_OS = 'Linux'.freeze
 
-      def self.bookmark_urls(bookmark_tabs, bookmark_path = nil)
+      # @param [Array][String] bookmark_tabs
+      # @param [String] bookmark_path
+      def self.call(bookmark_tabs, bookmark_path)
         bookmark_path ||= bookmark_json_path
         bookmark_json = JSON.parse(File.read(bookmark_path), { symbolize_names: true })
         bookmarks = bookmark_json.dig(:roots, :bookmark_bar, :children)
@@ -18,6 +22,8 @@ module YtDownloader
 
       private
 
+      # @param [Array][Hash] bookmarks
+      # @param [Array][String] tabs
       def self.extract_urls(bookmarks, tabs)
         bookmarks.inject([]) do |acc, bookmark|
           if tabs.empty?
@@ -32,6 +38,7 @@ module YtDownloader
         end
       end
 
+      # @return [String]
       def self.bookmark_json_path
         case os
         when LINUX_OS
@@ -39,25 +46,29 @@ module YtDownloader
         when MAC_OSX
           "/Users/#{whoami}/Library/Application Support/Google/Chrome/Default/Bookmarks"
         else
-          raise 'Unsupported os'
+          raise "Unsupported #{os} os!"
         end
       end
 
+      # @param [Hash] bookmark
+      # @return [Array][Bookmark]
       def self.aggregate_bookmarks(bookmark)
         return [] if bookmark[:children].nil?
 
         bookmark[:children].map { |b| Bookmark.new(*(b.values_at(:url, :name) << bookmark[:name])) }
       end
 
-      # Stub methods for testing
+      # NOTE: Stub methods for testing
       #
       #
+      # @return [String]
       def self.os
-        Commands.os
+        `echo $(uname -s)`.strip
       end
 
+      # @return [String]
       def self.whoami
-        Commands.whoami
+        `whoami`.strip
       end
     end
   end

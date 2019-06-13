@@ -1,7 +1,10 @@
 module YtDownloader
-  module Parser
+  class Parser
     class Base
-      def self.bookmark_urls(bookmark_tabs, bookmark_path = nil)
+
+      # @param [Array][String] bookmark_tabs
+      # @param [String] bookmark_path
+      def self.call(bookmark_tabs, bookmark_path)
         raise 'Override this method!'
       end
     end
