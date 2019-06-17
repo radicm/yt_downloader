@@ -3,6 +3,14 @@
 ## Installation
 
 ```shell
+$ brew install ffmpeg 
+# or
+$ apt-get install ffmpeg
+
+$ brew install youtube-dl
+# or
+$ apt-get install youtube-dl
+
 $ gem install yt_downloader
 ```
 
